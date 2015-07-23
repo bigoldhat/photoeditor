@@ -36,6 +36,7 @@ function plasma(img) {
     var pixels = ImageUtils.getPixels(img);
     var length = pixels.data.length;
     var data = pixels.data;
+    console.log(pixels);
 
     /* Select the top-left coordinates of a random 50x50 square */
     var x = getRandomInt(0, img.width-50);
@@ -54,7 +55,6 @@ function plasma(img) {
     //}
 
     var colour = new RGBA();
-    console.log(colour);
 
     for (var i = 0; i < Math.pow(50,2); i += 4) {
         /* Using the Pythagorean theorem, I must carefully manipulate each alpha value according to the pixel's distance from the pixel (25,25).
@@ -66,7 +66,14 @@ function plasma(img) {
         var pixelYCoord = Math.round(i%50);
 
         var originalRGBA = new RGBA(data[i], data[i+1], data[i+2], data[i+3]);
-        var modifiedRGBA = modifyPixel(data, i, pixelXCoord, pixelYCoord, originalRGBA);
+        //console.log("original: ", originalRGBA);
+        var modifiedRGBA = modifyPixel(pixelXCoord, pixelYCoord, originalRGBA);
+        //console.log("modified:", modifiedRGBA);
+
+        data[i] = modifiedRGBA.red;
+        data[i+1] = modifiedRGBA.green;
+        data[i+2] = modifiedRGBA.blue;
+        data[i+3] = modifiedRGBA.alpha;
     }
 
     /* I then need to return the array to it's original state.*/
@@ -75,14 +82,15 @@ function plasma(img) {
             data.push(data_new[i][j]);
         }
     }*/
-
-    //pixels.data.set(data_new);
+    pixels.data.set(pixels);
+    console.log(pixels);
     ImageUtils.putPixels(pixels, img.width, img.height);
 }
 
-function modifyPixel(data, i, pixelXCoord, pixelYCoord, modifiedRGBA) {
-    modifiedRGBA[3] = data[i][modifiedRGBA[3]] = 255 / (Math.sqrt(Math.pow(pixelXCoord - 25, 2) + (Math.pow(pixelYCoord - 25, 2))));
-    return new RGBA(modifiedRGBA);
+function modifyPixel(pixelXCoord, pixelYCoord, originalRGBA) {
+    var modifiedRGBA = new RGBA(0, originalRGBA.green, originalRGBA.blue, originalRGBA.alpha);
+    //modifiedRGBA.alpha = 255 / (Math.sqrt(Math.pow(pixelXCoord - 25, 2) + (Math.pow(pixelYCoord - 25, 2))));
+    return modifiedRGBA;
 }
 
 /* Select a random RGB value*/
